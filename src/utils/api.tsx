@@ -1,49 +1,64 @@
+import Vapi from "@vapi-ai/web";
 
-import { EstimationFormData, EstimationResult } from "@/types";
-import { toast } from "sonner";
+const vapi = new Vapi("27243ed2-a510-423f-91df-9c23f5c132cf");
 
-// This function would call a real API in production
-export const getEstimation = async (formData: EstimationFormData): Promise<EstimationResult> => {
-  try {
-    // In a real implementation, this would call the Cerebras AI API
-    // For demonstration, we're mocking the API response
-    console.log("Submitting data for estimation:", formData);
-    
-    // Simulate network request
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    // Mock response based on the input data
-    const mockResult: EstimationResult = {
-      estimatedValue: `$${(Math.random() * 50000 + 10000).toFixed(2)}`,
-      returnOnInvestment: `${(Math.random() * 30 + 5).toFixed(1)}%`,
-      marketTrends: formData.renovationType === "Kitchen" 
-        ? "Kitchen renovations are currently showing strong returns in the market."
-        : "This type of renovation has shown positive value growth in recent months.",
-      recommendations: [
-        "Consider energy-efficient appliances for better ROI",
-        "High-quality materials tend to yield better returns",
-        "Professional installation is recommended for this renovation"
-      ],
-      confidence: Math.random() * 30 + 70,
-    };
-    
-    return mockResult;
-  } catch (error) {
-    console.error("Error getting estimation:", error);
-    toast.error("Failed to get estimation. Please try again.");
-    throw error;
-  }
+const assistantOptions = {
+  name: "Vapi’s Pizza Front Desk",
+  firstMessage: "Vappy’s Pizzeria speaking, how can I help you?",
+  transcriber: {
+    provider: "deepgram",
+    model: "nova-2",
+    language: "en-US",
+  },
+  voice: {
+    provider: "playht",
+    voiceId: "jennifer",
+  },
+  model: {
+    provider: "openai",
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: `You are a voice assistant for Vappy’s Pizzeria, a pizza shop located on the Internet.
+
+  Your job is to take the order of customers calling in. The menu has only 3 types
+  of items: pizza, sides, and drinks. There are no other types of items on the menu.
+
+  1) There are 3 kinds of pizza: cheese pizza, pepperoni pizza, and vegetarian pizza
+  (often called "veggie" pizza).
+  2) There are 3 kinds of sides: french fries, garlic bread, and chicken wings.
+  3) There are 2 kinds of drinks: soda, and water. (if a customer asks for a
+  brand name like "coca cola", just let them know that we only offer "soda")
+
+  Customers can only order 1 of each item. If a customer tries to order more
+  than 1 item within each category, politely inform them that only 1 item per
+  category may be ordered.
+
+  Customers must order 1 item from at least 1 category to have a complete order.
+  They can order just a pizza, or just a side, or just a drink.
+
+  Be sure to introduce the menu items, don't assume that the caller knows what
+  is on the menu (most appropriate at the start of the conversation).
+
+  If the customer goes off-topic or off-track and talks about anything but the
+  process of ordering, politely steer the conversation back to collecting their order.
+
+  Once you have all the information you need pertaining to their order, you can
+  end the conversation. You can say something like "Awesome, we'll have that ready
+  for you in 10-20 minutes." to naturally let the customer know the order has been
+  fully communicated.
+
+  It is important that you collect the order in an efficient manner (succinct replies
+  & direct questions). You only have 1 task here, and it is to collect the customers
+  order, then end the conversation.
+
+  - Be sure to be kind of funny and witty!
+  - Keep all your responses short and simple. Use casual language, phrases like "Umm...", "Well...", and "I mean" are preferred.
+  - This is a voice conversation, so keep your responses short, like in a real conversation. Don't ramble for too long.`,
+      },
+    ],
+  },
 };
 
-export const uploadImage = async (file: File): Promise<string> => {
-  try {
-    // In a real implementation, this would upload to a storage service
-    // For now, we'll create a local object URL
-    console.log("Uploading image:", file.name);
-    return URL.createObjectURL(file);
-  } catch (error) {
-    console.error("Error uploading image:", error);
-    toast.error("Failed to upload image. Please try again.");
-    throw error;
-  }
-};
+vapi.start(assistantOptions);
