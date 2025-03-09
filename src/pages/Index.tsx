@@ -1,12 +1,20 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import React from "react";
+import Header from "../components/Header";
+import HeroSection from "../components/HeroSection";
+import EstimationForm from "../components/EstimationForm";
+
+const Index: React.FC = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col items-center">
+      <Header />
+      <main className="flex-1 w-full max-w-7xl mx-auto flex flex-col items-center">
+        <HeroSection />
+        <EstimationForm />
+      </main>
+      <footer className="w-full py-8 text-center text-sm text-muted-foreground">
+        <p>© {new Date().getFullYear()} RenovateValue. All rights reserved.</p>
+      </footer>
     </div>
   );
 };
