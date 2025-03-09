@@ -1,4 +1,3 @@
-
 import React from "react";
 import Header from "../components/Header";
 import HeroSection from "../components/HeroSection";
@@ -9,7 +8,7 @@ const Index: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center">
       <Header />
       <main className="flex-1 w-full max-w-7xl mx-auto flex flex-col items-center">
-        <HeroSection />
+        {/* <HeroSection /> */}
         <EstimationForm />
       </main>
       <footer className="w-full py-8 text-center text-sm text-muted-foreground">

@@ -72,32 +72,42 @@ const EstimationForm: React.FC = () => {
         </div>
       ) : (
         <div className="flex justify-center">
-            <button
+          <button
             onClick={() => {
-              const newWindow = window.open("", "_blank", "width=600,height=400");
+              const newWindow = window.open(
+                "",
+                "_blank",
+                "width=600,height=400"
+              );
               if (newWindow) {
-              newWindow.document.write("<p>Processing conversation...</p>");
-              setIsSubmitting(true);
-              try {
-                vapi.start(assistantOptions).then((conversationResult: string) => {
-                newWindow.document.write(`<p>${conversationResult}</p>`);
-                setResult(conversationResult);
-                toast.success("Estimation completed successfully");
-                });
-              } catch (error) {
-                console.error("Error starting conversation:", error);
-                newWindow.document.write("<p>Failed to start conversation. Please try again.</p>");
-                toast.error("Failed to start conversation. Please try again.");
-              } finally {
-                setIsSubmitting(false);
-              }
+                newWindow.document.write("<p>Processing conversation...</p>");
+                setIsSubmitting(true);
+                try {
+                  vapi
+                    .start(assistantOptions)
+                    .then((conversationResult: string) => {
+                      newWindow.document.write(`<p>${conversationResult}</p>`);
+                      setResult(conversationResult);
+                      toast.success("Estimation completed successfully");
+                    });
+                } catch (error) {
+                  console.error("Error starting conversation:", error);
+                  newWindow.document.write(
+                    "<p>Failed to start conversation. Please try again.</p>"
+                  );
+                  toast.error(
+                    "Failed to start conversation. Please try again."
+                  );
+                } finally {
+                  setIsSubmitting(false);
+                }
               }
             }}
             disabled={isSubmitting}
             className="px-8 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-all duration-200 shadow-soft flex items-center justify-center disabled:opacity-70"
-            >
+          >
             {isSubmitting ? "Starting..." : "Start Voice Conversation"}
-            </button>
+          </button>
         </div>
       )}
     </section>
