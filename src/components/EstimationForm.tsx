@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { toast } from "sonner";
 import Vapi from "@vapi-ai/web";
 
@@ -33,19 +33,50 @@ const assistantOptions = {
 const EstimationForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const newWindowRef = useRef<Window | null>(null); // To track the new window
 
   const handleStartConversation = () => {
     setIsSubmitting(true);
-    try {
-      vapi.start(assistantOptions).then((conversationResult: string) => {
-        setResult(conversationResult);
-        toast.success("Estimation completed successfully");
-      });
-    } catch (error) {
-      console.error("Error starting conversation:", error);
-      toast.error("Failed to start conversation. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+    const newWindow = window.open("", "_blank", "width=600,height=400");
+    newWindowRef.current = newWindow; // Store the reference to the new window
+
+    if (newWindow) {
+      newWindow.document.write("<p>Processing conversation...</p>");
+
+      const cancelRequest = () => {
+        // Handle the case when the window is closed
+        toast.error(
+          "The conversation was canceled because the window was closed."
+        );
+        setIsSubmitting(false);
+      };
+
+      // Periodically check if the window is closed
+      const checkWindowClosed = setInterval(() => {
+        if (newWindow.closed) {
+          cancelRequest();
+          clearInterval(checkWindowClosed); // Clear the interval
+        }
+      }, 1000); // Check every second
+
+      try {
+        vapi.start(assistantOptions).then((conversationResult: string) => {
+          if (!newWindow.closed) {
+            newWindow.document.body.innerHTML = `<p>${conversationResult}</p>`;
+            toast.success("Estimation completed successfully");
+          }
+        });
+      } catch (error) {
+        console.error("Error starting conversation:", error);
+        if (newWindow && !newWindow.closed) {
+          newWindow.document.body.innerHTML =
+            "<p>Failed to start conversation. Please try again.</p>";
+        }
+        toast.error("Failed to start conversation. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+        clearInterval(checkWindowClosed); // Clear the interval when done
+      }
     }
   };
 
